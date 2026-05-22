@@ -1,0 +1,25 @@
+{{!-- este archivo siempre tiene que estar al nivel de las carpetas de layou y partial --}}
+<h2> Hola, {{usuario.nombre}}</h2>
+
+{{# if (eq usuario "admin")}}
+<p style="color:brown">Eres administrador</p>
+{{/if}}
+
+
+{{#if esAdmin}}
+<p style="color: chartreuse;">Modo usuario normal</p>
+{{/if}}
+
+<hr/>
+
+<h3>Nuestros clientes son</h3>
+
+{{#if hayTurnos}}
+<ul>
+    {{#each consulta}}
+    <li>{{this.consulta}} - ${{this.valor}}</li>
+    {{/each}}
+</ul>
+{{else}}
+<p>No hay turno</p>
+{{/if}}
