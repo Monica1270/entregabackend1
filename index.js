@@ -1,5 +1,7 @@
+
 /* //=====hacemos las instalaciones 
 //npm init -y; npm install express; .gitignore y ponemos node-modules/; npm install --save-dev nodemon; install express-handlebars */
+
 const express = require ("express");
 const {engine} = require ("express-handlebars");
 const path = require("path");

@@ -1,0 +1,7 @@
+En el server se contendra el código backend
+connection se dispara cuando un cliente establece conexion
+io.on('connection', (socket)=>{console.log('Cliente conectado ${socket.id}')})
+disconnect se dispara cuando un cliente se desconecta
+io.on('disconnect', ()=>{
+    console.log('Cliente desconectado ${socket.id}')})
+    

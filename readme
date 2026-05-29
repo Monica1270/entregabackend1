@@ -1,0 +1,7 @@
+#Backend uno
+-Se ha utilizado express, multer, path, fs, handlebars.
+-se ha dividido en carpteas views:
+-En layout se encuentra el archivo main donde se le da estilo 
+-En partial se encuentra el archio home donde escribo lo que quiero que se vea en el frontend
+-El archivo home es el principal de views ya que ahi se escribe la logica de la appi
+#multer se utiliza para filtrar los archivos dañinos, y subir fotos o pdf restringiendo el tamaño de los mismo

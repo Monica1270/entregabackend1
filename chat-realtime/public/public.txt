@@ -1,0 +1,1 @@
+Se alojará los archivos estáticos que el cliente descargará

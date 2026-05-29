@@ -1,7 +1,7 @@
 {
   "name": "entregabackend1",
   "version": "1.0.0",
-  "description": "",
+  "description": "-Se ha utilizado express, multer, path, fs, handlebars.\r -se ha dividido en carpteas views:\r -En layout se encuentra el archivo main donde se le da estilo \r -En partial se encuentra el archio home donde escribo lo que quiero que se vea en el frontend\r -El archivo home es el principal de views ya que ahi se escribe la logica de la appi\r #multer se utiliza para filtrar los archivos dañinos, y subir fotos o pdf restringiendo el tamaño de los mismo",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -12,11 +12,21 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "expres": "^0.0.5",
     "express": "^5.2.1",
     "express-handlebars": "^8.0.3",
-    "multer": "^2.1.1"
+    "multer": "^2.1.1",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Monica1270/entregabackend1.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Monica1270/entregabackend1/issues"
+  },
+  "homepage": "https://github.com/Monica1270/entregabackend1#readme"
 }
