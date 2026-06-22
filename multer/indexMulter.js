@@ -1,5 +1,5 @@
 //============Vamos a aprender a recibir archivos (imagen, pdfs)desde el frontend
-//===antes instalar npm install multer
+//===antes instalar pnpm install multer
 //copie y pegue las const  
 const express = require("express");
 const multer = require("multer");

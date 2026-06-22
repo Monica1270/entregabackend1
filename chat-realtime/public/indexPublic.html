@@ -1,12 +1,492 @@
-//interfaz del cliente
+<!-- interfaz del cliente -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>⚡ Chat en Tiempo Real — Socket.IO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      --glass-bg: rgba(30, 41, 59, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.2);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      overflow: hidden;
+    }
+
+    .chat-container {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      width: 100%;
+      max-width: 900px;
+      height: 85vh;
+      border-radius: 24px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      background: rgba(15, 23, 42, 0.5);
+      border-right: 1px solid var(--glass-border);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .brand-logo {
+      background: var(--primary);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .status-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      padding: 1rem;
+      border-radius: 14px;
+      margin-bottom: 1.5rem;
+    }
+
+    .status-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      display: inline-block;
+      box-shadow: 0 0 8px #ef4444;
+    }
+
+    .dot.connected {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .dot.connecting {
+      background: #f59e0b;
+      box-shadow: 0 0 8px #f59e0b;
+      animation: pulse 1s infinite alternate;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      padding: 0.8rem;
+      border-radius: 12px;
+      margin-top: auto;
+    }
+
+    .user-avatar {
+      background: var(--primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .user-details {
+      overflow: hidden;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .user-tag {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Main Chat Window */
+    .chat-window {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .chat-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-title h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .chat-title p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .messages-area {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Scrollbar Styling */
+    .messages-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    .messages-area::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .messages-area::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    .messages-area::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Message Bubbles */
+    .message {
+      max-width: 75%;
+      padding: 0.8rem 1rem;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      position: relative;
+      animation: messagePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    @keyframes messagePop {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.incoming {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.outgoing {
+      background: var(--primary);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .message-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      font-size: 0.75rem;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+
+    .message.incoming .message-sender {
+      color: #818cf8;
+    }
+
+    .message.outgoing .message-sender {
+      color: #e0e7ff;
+    }
+
+    .message-time {
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 400;
+    }
+
+    .message.outgoing .message-time {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .message-text {
+      word-break: break-word;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 0.5rem 1.5rem;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-style: italic;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 3px;
+    }
+
+    .typing-dots span {
+      width: 4px;
+      height: 4px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: typeDot 1s infinite alternate;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typeDot {
+      from { transform: scale(1); opacity: 0.4; }
+      to { transform: scale(1.5); opacity: 1; }
+    }
+
+    /* Input Footer */
+    .chat-footer {
+      padding: 1.2rem 1.5rem;
+      border-top: 1px solid var(--glass-border);
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    .input-form {
+      display: flex;
+      gap: 12px;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .chat-input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 0.9rem 1.2rem;
+      color: #fff;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .btn-send {
+      background: var(--primary);
+      border: none;
+      color: #fff;
+      padding: 0 1.5rem;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-send:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-send:active {
+      transform: translateY(0);
+    }
+
+    @keyframes pulse {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
+    }
+
+    /* SweetAlert2 Custom Styling */
+    .swal2-popup {
+      background: #1e293b !important;
+      border: 1px solid var(--glass-border) !important;
+      border-radius: 20px !important;
+      color: #fff !important;
+    }
+    .swal2-title {
+      color: #fff !important;
+    }
+    .swal2-input {
+      background: #0f172a !important;
+      border: 1px solid var(--glass-border) !important;
+      color: #fff !important;
+      border-radius: 10px !important;
+    }
+    .swal2-input:focus {
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 8px rgba(99, 102, 241, 0.3) !important;
+    }
+    .swal2-confirm {
+      background-color: var(--primary) !important;
+      border-radius: 10px !important;
+      padding: 10px 24px !important;
+    }
+  </style>
 </head>
 <body>
-    
+  <div class="chat-container">
+    <!-- Sidebar Izquierda -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-logo">⚡</div>
+          <span class="brand-title">SOCKET.IO CHAT</span>
+        </div>
+
+        <div class="status-card">
+          <div class="status-title">Conexión</div>
+          <div class="status-badge">
+            <span id="statusDot" class="dot"></span>
+            <span id="statusText">Desconectado</span>
+          </div>
+        </div>
+
+        <div class="status-card" id="reconnectCard" style="display: none;">
+          <div class="status-title">Reconexión</div>
+          <div style="font-size: 0.8rem; color: #f59e0b;">
+            ⚠️ Intentando reconectar... <br>
+            <span style="font-size: 0.72rem; color: var(--text-muted);" id="reconnectAttempts">Intentos: 0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info del Usuario logueado -->
+      <div class="user-info" id="userCard" style="visibility: hidden;">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <div class="user-details">
+          <div class="user-name" id="myUsername">Cargando...</div>
+          <div class="user-tag">Activo en Chat</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Ventana de Mensajes Derecha -->
+    <main class="chat-window">
+      <header class="chat-header">
+        <div class="chat-title">
+          <h2>💬 Canal General</h2>
+          <p>Comunicación instantánea full-duplex bidireccional</p>
+        </div>
+      </header>
+
+      <!-- Area donde se renderizan los globos de texto -->
+      <section class="messages-area" id="messagesArea"></section>
+
+      <!-- Indicador "Escribiendo..." -->
+      <div class="typing-indicator" id="typingIndicator" style="visibility: hidden;">
+        <span id="typingUser">Alguien</span> está escribiendo
+        <div class="typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+
+      <!-- Formulario para enviar texto -->
+      <footer class="chat-footer">
+        <form class="input-form" id="chatForm" onsubmit="event.preventDefault();">
+          <div class="input-wrapper">
+            <input type="text" id="messageInput" class="chat-input" placeholder="Escribe un mensaje aquí..." autocomplete="off"/>
+          </div>
+          <button type="submit" class="btn-send" id="btnSend">
+            <span>Enviar</span> 🚀
+          </button>
+        </form>
+      </footer>
+    </main>
+  </div>
+
+  <!-- El script del cliente Socket.IO se sirve automáticamente en esta ruta -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/contactoClient.js"></script>
 </body>
 </html>
